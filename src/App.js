@@ -5,6 +5,8 @@ class App extends Component {
     return (
       <div>
         1112233
+        <button>11</button>
+        <button>22</button>
       </div>
     );
   }
