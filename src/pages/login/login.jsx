@@ -3,6 +3,7 @@ import { Form, Icon, Input, Button } from 'antd'
 
 import './login.less'
 import logo from '../../assets/images/logo.png'
+import {reqLogin} from '../../api'
 
 class Login extends Component {
 
@@ -10,11 +11,45 @@ class Login extends Component {
 
     handleSubmit = (event) => {
         event.preventDefault();
-        this.props.form.validateFields((err, values) => {
+        this.props.form.validateFields(async (err, values) => {
             if (!err) {
-                console.log('Received values of form: ', values);
+                const {username, password} = values
+                // reqLogin(username, password).then((response)=>{
+                //     console.log("请求成功",response.data)
+                // }).catch((error)=>{
+                //     console.log("请求失败",error)
+                // })
+
+                // try {
+                //     const response = await reqLogin(username, password) 
+                //     console.log("请求成功",response.data)
+                // } catch (error) {
+                //     console.log("请求失败",error)
+                // }
+
+                
+                const response = await reqLogin(username, password) 
+                console.log("请求成功",response)
+              
+
+            }else {
+                console.log("效验失败")
             }
         });
+    }
+
+    validatorPwd = (rule, value, callback) => {
+        if(!value){
+            callback("请填写密码")
+        }else if(value.length < 4){
+            callback("密码长度不小于4位")
+        }else if(value.length > 12){
+            callback("密码长度不大于12位")
+        }else if(!/^[a-zA-Z0-9]+$/.test(value)){
+            callback("下划线字母数字组合")
+        }else{
+            callback()
+        }
     }
 
     render() {
@@ -38,6 +73,7 @@ class Login extends Component {
                                         { max: 12, message: '最大12位' },
                                         { pattern: /^[a-zA-Z0-9]+$/, message: '下划线字母数字组合' }
                                     ],
+                                    initialValue : "admin"
                                 })(
                                     <Input
                                         prefix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />}
@@ -48,7 +84,9 @@ class Login extends Component {
                         </Form.Item>
                         <Form.Item>
                             {
-                                getFieldDecorator("password", {})(
+                                getFieldDecorator("password", {
+                                    rules: [{ validator: this.validatorPwd}],
+                                })(
                                     <Input
                                         prefix={<Icon type="lock" style={{ color: 'rgba(0,0,0,.25)' }} />}
                                         type="password"
@@ -69,5 +107,5 @@ class Login extends Component {
         );
     }
 }
-const WrappedNormalLoginForm = Form.create()(Login);
-export default WrappedNormalLoginForm;
+const WrappedLogin = Form.create()(Login);
+export default WrappedLogin;
