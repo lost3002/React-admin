@@ -1,9 +1,12 @@
 import React, { Component } from 'react';
-import { Form, Icon, Input, Button } from 'antd'
+import { Form, Icon, Input, Button, message } from 'antd'
+import {Redirect} from 'react-router-dom'
 
 import './login.less'
 import logo from '../../assets/images/logo.png'
 import {reqLogin} from '../../api'
+import memoryUtils from '../../utils/memoryUtils'
+import localstoreUtils from '../../utils/localstoreUtils'
 
 class Login extends Component {
 
@@ -28,9 +31,17 @@ class Login extends Component {
                 // }
 
                 
-                const response = await reqLogin(username, password) 
-                console.log("请求成功",response)
-              
+                const result = await reqLogin(username, password) 
+                if(result.status===0){
+                    message.success("登录成功")
+                    const user = result.data
+                    localstoreUtils.saveUser(user)
+                    memoryUtils.user = user
+
+                    this.props.history.replace("/")
+                }else{
+                    message.error(result.msg)
+                }
 
             }else {
                 console.log("效验失败")
@@ -55,6 +66,11 @@ class Login extends Component {
     render() {
         const form = this.props.form
         const { getFieldDecorator } = form
+
+        if(memoryUtils.user && memoryUtils.user._id){
+            return <Redirect to="/"/>
+        }
+        
         return (
             <div className="login">
                 <header className="login-header">
