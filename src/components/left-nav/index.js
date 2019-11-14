@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, withRouter } from 'react-router-dom'
 
 import { Menu, Icon } from 'antd';
 
@@ -11,7 +11,7 @@ import menuList from '../../config/menuConfig'
 
 const { SubMenu } = Menu;
 
-export default class LeftNav extends Component {
+ class LeftNav extends Component {
 
     menuList_map = (menuList) => {
         return menuList.map((item, index) => {
@@ -43,6 +43,7 @@ export default class LeftNav extends Component {
         })
     }
     menuList_reduce =(menuList) => {
+        const path = this.props.location.pathname
         return menuList.reduce((pre,item) => {
             if(!item.children){
                 pre.push((
@@ -54,6 +55,15 @@ export default class LeftNav extends Component {
                     </Menu.Item>
                 ))
             }else{
+
+            //    const openKeys = item.children.find(citem => citem.key === path )
+            const openKeys = item.children.find(citem => path.indexOf(citem.key) ===0)
+               if(openKeys){
+                   this.openKeys = item.key
+                   console.log(this)
+               }
+
+
                 pre.push((
                     <SubMenu
                         key={item.key}
@@ -72,6 +82,9 @@ export default class LeftNav extends Component {
         },[])
     }
 
+    componentWillMount () {
+        this.menuNodes = this.menuList_reduce(menuList)
+    }
    
 
     render() {
@@ -79,7 +92,8 @@ export default class LeftNav extends Component {
 
 
 
-
+       const path = this.props.location.pathname
+       const openKey = this.openKeys
 
 
         return (
@@ -89,16 +103,18 @@ export default class LeftNav extends Component {
                     <h2>后台管理</h2>
                 </Link>
                 <Menu
-                    // defaultSelectedKeys={['1']}
-                    // defaultOpenKeys={['sub1']}
+                    selectedKeys={[path]}
+                    defaultOpenKeys={[openKey]}
                     mode="inline"
                     theme="dark"
                 // inlineCollapsed={this.state.collapsed}
                 >
-                    {this.menuList_reduce(menuList)}
+                    {this.menuNodes}
 
                 </Menu>
             </div>
         )
     }
 }
+
+export default withRouter(LeftNav)

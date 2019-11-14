@@ -33,11 +33,11 @@ class Admin extends Component {
                     </Sider>
                     <Layout>
                         <Header>Header</Header>
-                        <Content style={{ background: '#FFF' }}>
+                        <Content style={{ background: '#FFF' ,margin : '20px 15px'}}>
                             <Switch>
                                 <Route path='/home' component={Home}></Route>
-                                <Route path='/product' component={Product}></Route>
-                                <Route path='/category' component={Category}></Route>
+                                <Route path='/products/product' component={Product}></Route>
+                                <Route path='/products/category' component={Category}></Route>
                                 <Route path='/role' component={Role}></Route>
                                 <Route path='/user' component={User}></Route>
                                 <Route path='/charts/bar' component={Bar}></Route>
