@@ -2,8 +2,9 @@ import React, { Component } from 'react';
 import { Card, Table, Button, message, Icon, Modal } from 'antd'
 
 import LinkButton from '../../components/link-button'
-import { reqCategorys } from '../../api'
-import AddFrom from './add-form' 
+import { reqCategorys, reqUpdateCategory, reqAddCategory } from '../../api'
+import AddForm from './add-form'
+import UpdateForm from './update-form'
 
 class Category extends Component {
 
@@ -28,7 +29,7 @@ class Category extends Component {
                 dataIndex: '',
                 render: (category) => (
                     <span>
-                        <LinkButton onClick={this.showUpdate}>修改</LinkButton>
+                        <LinkButton onClick={() => this.showUpdate(category)}>修改</LinkButton>
                         {
                             this.state.parentId === '0'
                                 ?
@@ -44,12 +45,13 @@ class Category extends Component {
 
 
 
-    getCategorys = async () => {
+    getCategorys = async (parentId) => {
         this.setState({ loading: true })
-        const { parentId } = this.state
+        //parentId: 如果没有指定根据状态中的parentId请求, 如果指定了根据指定的请求
+        parentId = parentId || this.state.parentId
         const result = await reqCategorys(parentId)
         this.setState({ loading: false })
-        console.log('cc', result)
+        // console.log('cc', result)
         if (result.status === 0) {
             const categorys = result.data
 
@@ -73,19 +75,41 @@ class Category extends Component {
     }
 
     handleCancel = () => {
-        this.setState({visible : 0})
+        this.form.resetFields()
+        this.setState({ visible: 0 })
     }
-    addCategory = () => {
-
+    addCategory = async() => {
+        this.setState({ visible: 0 })
+        const {categoryName, parentId} = this.form.getFieldsValue()
+        console.log('↓',categoryName,parentId)
+        this.form.resetFields()
+        const result = await reqAddCategory({parentId,categoryName})
+        if (result.status === 0) {
+            // 添加的分类就是当前分类列表下的分类
+            if(parentId === this.state.parentId){
+                // 重新获取当前分类列表显示
+                this.getCategorys()
+            }else if(parentId==='0'){// 在二级分类列表下添加一级分类, 重新获取一级分类列表, 但不需要显示一级列表
+                this.getCategorys('0')
+            }
+        }
     }
     showAdd = () => {
-        this.setState({visible: 1})
+        this.setState({ visible: 1 })
     }
-    updateCategory = () => {
-
+    updateCategory = async () => {
+        this.setState({ visible: 0 })
+        const categoryId = this.category._id
+        const categoryName = this.form.getFieldValue('categoryName')
+        this.form.resetFields()
+        const result = await reqUpdateCategory(categoryId, categoryName)
+        if (result.status === 0) {
+            this.getCategorys()
+        }
     }
-    showUpdate = () => {
-        this.setState({visible: 2})
+    showUpdate = (category) => {
+        this.category = category
+        this.setState({ visible: 2 })
     }
 
     componentWillMount() {
@@ -98,7 +122,7 @@ class Category extends Component {
 
     render() {
         const { categorys, loading, parentId, subCategorys, parentName, visible } = this.state
-
+        const category = this.category || {}
         const title = parentId === '0' ? '一级商品分类' : (
             <span>
                 <LinkButton onClick={this.showCategorys}>一级商品分类</LinkButton>
@@ -129,7 +153,11 @@ class Category extends Component {
                         onOk={this.addCategory}
                         onCancel={this.handleCancel}
                     >
-                        <AddFrom />
+                        <AddForm
+                            categorys={categorys}
+                            parentId={parentId}
+                            setForm={(form) => { this.form = form }}
+                        />
 
                     </Modal>
                     <Modal
@@ -138,7 +166,7 @@ class Category extends Component {
                         onOk={this.updateCategory}
                         onCancel={this.handleCancel}
                     >
-                        <p>Some contents...</p>
+                        <UpdateForm categoryName={category.name} setForm={(form) => this.form = form} />
 
                     </Modal>
                 </Card>

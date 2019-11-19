@@ -1,34 +1,49 @@
 import React, { Component } from 'react';
 import { Form, Select, Input } from 'antd'
+import PropTypes from 'prop-types'
 
 const { Item } = Form
 const { Option } = Select
 
-class AddFrom extends Component {
+class AddForm extends Component {
+    static propTypes = {
+        categorys: PropTypes.array.isRequired,
+        parentId: PropTypes.string.isRequired,
+        setForm: PropTypes.func.isRequired
+    }
+
+
+    componentWillMount () {
+        this.props.setForm(this.props.form)
+    }
     render() {
+        const { categorys, parentId } = this.props
         const { getFieldDecorator } = this.props.form
         return (
             <Form>
+                选择分类：
                 <Item>
                     {
                         getFieldDecorator('parentId', {
-                            initialValue: '0'
+                            initialValue: parentId
                         })(
                             <Select>
                                 <Option value='0'>一级分类</Option>
-                                <Option value='1'>家电</Option>
-                                <Option value='2'>图书</Option>
+                                {
+                                    categorys.map((c,index) => <Option value={c._id} key={index}>{c.name}</Option>)
+                                }
                             </Select>
                         )
                     }
 
                 </Item>
+                添加分类：
                 <Item>
                     {
                         getFieldDecorator('categoryName', {
                             initialValue: ''
                         })(
-                           <Input placeholder='请输入需要修改的名称' />
+                            <Input placeholder='请输入需要添加的名称' />
                         )
                     }
 
@@ -39,4 +54,4 @@ class AddFrom extends Component {
     }
 }
 
-export default Form.create()(AddFrom)
+export default Form.create()(AddForm)
