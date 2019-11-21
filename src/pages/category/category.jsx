@@ -74,38 +74,55 @@ class Category extends Component {
         })
     }
 
-    handleCancel = () => {
-        this.form.resetFields()
-        this.setState({ visible: 0 })
-    }
-    addCategory = async() => {
-        this.setState({ visible: 0 })
-        const {categoryName, parentId} = this.form.getFieldsValue()
-        console.log('↓',categoryName,parentId)
-        this.form.resetFields()
-        const result = await reqAddCategory({parentId,categoryName})
-        if (result.status === 0) {
-            // 添加的分类就是当前分类列表下的分类
-            if(parentId === this.state.parentId){
-                // 重新获取当前分类列表显示
-                this.getCategorys()
-            }else if(parentId==='0'){// 在二级分类列表下添加一级分类, 重新获取一级分类列表, 但不需要显示一级列表
-                this.getCategorys('0')
+    // handleCancel = () => {
+    //     this.form.resetFields()
+    //     this.setState({ visible: 0 })
+    // }
+    addCategory = () => {
+        this.form.validateFields(async (err, values) => {
+            if (!err) {
+                this.setState({ visible: 0 })
+                const { categoryName, parentId } = this.form.getFieldsValue()
+                // const { categoryName, parentId } = values
+                console.log('↓', categoryName, parentId)
+                this.form.resetFields()
+                console.log('↓↓', categoryName, parentId)
+                const result = await reqAddCategory({ parentId, categoryName })
+                if (result.status === 0) {
+                    message.success('添加分类成功')
+                    // this.getCategorys()
+                    // 添加的一级分类
+                    if (parentId === '0' || parentId === undefined) {
+                        this.getCategorys('0')
+                        //添加当前的二级分类
+                    } else if (parentId === this.state.parentId) {
+                        this.getCategorys()
+                    }
+                }
             }
-        }
+        })
+
     }
     showAdd = () => {
         this.setState({ visible: 1 })
     }
-    updateCategory = async () => {
-        this.setState({ visible: 0 })
-        const categoryId = this.category._id
-        const categoryName = this.form.getFieldValue('categoryName')
-        this.form.resetFields()
-        const result = await reqUpdateCategory(categoryId, categoryName)
-        if (result.status === 0) {
-            this.getCategorys()
-        }
+    updateCategory = () => {
+        this.form.validateFields(async (err, values) => {
+            if (!err) {
+                this.setState({ visible: 0 })
+
+                const categoryName = this.form.getFieldValue('categoryName')
+                // const { categoryName } = values
+                this.form.resetFields()
+                const categoryId = this.category._id
+                const result = await reqUpdateCategory(categoryId, categoryName)
+                if (result.status === 0) {
+                    message.success('更新分类成功')
+                    this.getCategorys()
+                }
+            }
+        })
+
     }
     showUpdate = (category) => {
         this.category = category
@@ -151,7 +168,12 @@ class Category extends Component {
                         title="添加分类"
                         visible={visible === 1}
                         onOk={this.addCategory}
-                        onCancel={this.handleCancel}
+                        onCancel={
+                            () => {
+                                this.form.resetFields()
+                                this.setState({ visible: 0 })
+                            }
+                        }
                     >
                         <AddForm
                             categorys={categorys}
@@ -164,7 +186,12 @@ class Category extends Component {
                         title="修改分类"
                         visible={visible === 2}
                         onOk={this.updateCategory}
-                        onCancel={this.handleCancel}
+                        onCancel={
+                            () => {
+                                this.form.resetFields()
+                                this.setState({ visible: 0 })
+                            }
+                        }
                     >
                         <UpdateForm categoryName={category.name} setForm={(form) => this.form = form} />
 

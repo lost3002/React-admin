@@ -41,7 +41,10 @@ class AddForm extends Component {
                 <Item>
                     {
                         getFieldDecorator('categoryName', {
-                            initialValue: ''
+                            initialValue: '',
+                            rules: [
+                                {required: true, message: '分类名称必须输入'}
+                              ]
                         })(
                             <Input placeholder='请输入需要添加的名称' />
                         )

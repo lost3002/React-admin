@@ -1,11 +1,19 @@
 import React, { Component } from 'react';
+import {Switch, Route, Redirect} from 'react-router-dom'
+
+import ProductUpdate from './add-update'
+import ProductDetail from './detail'
+import ProductHome from './home'
 
 class Product extends Component {
     render() {
         return (
-            <div>
-                product
-            </div>
+            <Switch>
+                <Route path='/products/product' component={ProductHome} exact></Route>
+                <Route path='/products/product/detail' component={ProductDetail}></Route>
+                <Route path='/products/product/addupdate' component={ProductUpdate}></Route>
+                <Redirect to='/products/product'></Redirect>
+            </Switch>
         );
     }
 }
