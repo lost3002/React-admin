@@ -5,6 +5,8 @@ import ProductUpdate from './add-update'
 import ProductDetail from './detail'
 import ProductHome from './home'
 
+import './detail.less'
+
 class Product extends Component {
     render() {
         return (
