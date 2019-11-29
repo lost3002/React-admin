@@ -11,7 +11,7 @@ import menuList from '../../config/menuConfig'
 
 const { SubMenu } = Menu;
 
- class LeftNav extends Component {
+class LeftNav extends Component {
 
     menuList_map = (menuList) => {
         return menuList.map((item, index) => {
@@ -42,10 +42,11 @@ const { SubMenu } = Menu;
 
         })
     }
-    menuList_reduce =(menuList) => {
+    menuList_reduce = (menuList) => {
         const path = this.props.location.pathname
-        return menuList.reduce((pre,item) => {
-            if(!item.children){
+       
+        return menuList.reduce((pre, item) => {
+            if (!item.children) {
                 pre.push((
                     <Menu.Item key={item.key}>
                         <Link to={item.key}>
@@ -54,14 +55,14 @@ const { SubMenu } = Menu;
                         </Link>
                     </Menu.Item>
                 ))
-            }else{
+            } else {
 
-            //    const openKeys = item.children.find(citem => citem.key === path )
-            const openKeys = item.children.find(citem => path.indexOf(citem.key) ===0)
-               if(openKeys){
-                   this.openKeys = item.key
-                   console.log(this)
-               }
+                //    const openKeys = item.children.find(citem => citem.key === path )
+                const openKeys = item.children.find(citem => path.indexOf(citem.key) === 0)
+                if (openKeys) {
+                    this.openKeys = item.key
+                    console.log(this)
+                }
 
 
                 pre.push((
@@ -79,21 +80,24 @@ const { SubMenu } = Menu;
                 ))
             }
             return pre
-        },[])
+        }, [])
     }
 
-    componentWillMount () {
+    componentWillMount() {
         this.menuNodes = this.menuList_reduce(menuList)
     }
-   
+
 
     render() {
 
 
 
 
-       const path = this.props.location.pathname
-       const openKey = this.openKeys
+        let path = this.props.location.pathname
+        if (path.indexOf('/products/product') === 0) {
+            path = '/products/product'
+        }
+        const openKey = this.openKeys
 
 
         return (
