@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
-import { Card, Form, Input, Button, Icon, Cascader } from 'antd'
+import { Card, Form, Input, Button, Icon, Cascader, message } from 'antd'
 
 import LinkButton from '../../components/link-button'
-import { reqCategorys } from '../../api'
+import { reqCategorys, reqAddOrUpdateProduct } from '../../api'
 import PicturesWall from './pictures-wall'
+import RichTextEditor from './rich-text-editor'
 
 const { Item } = Form
 const { TextArea } = Input
@@ -13,12 +14,44 @@ class ProductAddupdate extends Component {
     state = {
         options: []
     }
+    constructor(props) {
+        super(props)
+        this.pw = React.createRef()
+        this.editor = React.createRef()
+    }
+
     submit = e => {
         e.preventDefault();
-        this.props.form.validateFields((err, values) => {
+        this.props.form.validateFields(async (err, values) => {
             if (!err) {
-                console.log('submit()',values)
-                alert('ajax请求')
+                // console.log('submit()', values)
+                const { name, desc, price, categoryIds } = values
+                let pCategoryId, categoryId
+                if (categoryIds === 1) {
+                    pCategoryId = '0'
+                    categoryId = categoryIds[0]
+                } else {
+                    pCategoryId = categoryIds[0]
+                    categoryId = categoryIds[1]
+                }
+                const imgs = this.pw.current.getImgs()
+                const detail = this.editor.current.getDetail()
+
+                const product = { name, desc, price, pCategoryId, categoryId, imgs, detail }
+                if (this.isUpdate) {
+                    product._id = this.product._id
+                }
+
+                const result = await reqAddOrUpdateProduct(product)
+
+                if (result.status === 0) {
+                    message.success(`${this.isUpdate? '修改' : '添加'}商品成功！`)
+                    this.props.history.goBack()
+                } else {
+                    message.error(`${this.isUpdate? '修改' : '添加'}商品失败！`)
+                }
+
+
             }
         })
     }
@@ -39,7 +72,7 @@ class ProductAddupdate extends Component {
         }))
 
         const { isUpdate, product } = this
-        const { pCategoryId} = product
+        const { pCategoryId } = product
         if (isUpdate && pCategoryId !== '0') {
 
             const subCategorys = await this.getCategorys(pCategoryId)
@@ -50,7 +83,7 @@ class ProductAddupdate extends Component {
                 isLeaf: true,
             }))
 
-            const targetOption = options.find( option => option.value === pCategoryId)
+            const targetOption = options.find(option => option.value === pCategoryId)
 
             targetOption.children = childOptions
         }
@@ -105,14 +138,17 @@ class ProductAddupdate extends Component {
         this.getCategorys('0')
     }
     componentWillMount() {
+        // 取出携带的state
+        // 如果是添加 就没值, 否则有值
         const product = this.props.location.state
+        // 保存是否是更新的标识
         this.isUpdate = !!product
         this.product = product || {}
     }
 
     render() {
         const { isUpdate, product } = this
-        const { pCategoryId, categoryId } = product
+        const { pCategoryId, categoryId, imgs, detail } = product
 
         const categoryIds = []
         if (isUpdate) {
@@ -205,10 +241,10 @@ class ProductAddupdate extends Component {
 
                         </Item>
                         <Item label='商品图片'>
-                            <PicturesWall />
+                            <PicturesWall ref={this.pw} imgs={imgs} />
                         </Item>
-                        <Item label='商品详情'>
-                            <div>商品详情</div>
+                        <Item label='商品详情' labelCol={{ span: 2 }} wrapperCol={{ span: 18 }}>
+                            <RichTextEditor ref={this.editor} detail={detail} />
                         </Item>
                         <Item>
                             <Button type='primary' onClick={this.submit}>提交</Button>
