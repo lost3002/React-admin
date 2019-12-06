@@ -26,7 +26,7 @@ class Admin extends Component {
         }
 
         return (
-            <div style={{ minHeight: '100%' }}>
+            <div style={{ height: '100%' }}>
                 <Layout style={{ minHeight: '100%' }} >
                     <Sider>
                         <LeftNav />
