@@ -1,11 +1,13 @@
 import React, {Component} from 'react'
 import {Link, withRouter} from 'react-router-dom'
 import {Menu, Icon} from 'antd';
+import {connect} from 'react-redux'
 
 import logo from '../../assets/images/logo.png'
 import menuList from '../../config/menuConfig'
 import './index.less'
 import memoryUtils from "../../utils/memoryUtils";
+import {setHeadTitle} from '../../redux/actions'
 
 const SubMenu = Menu.SubMenu;
 
@@ -112,9 +114,14 @@ class LeftNav extends Component {
       if (this.hasAuth(item)) {
         // 向pre添加<Menu.Item>
         if(!item.children) {
+           // 判断item是否是当前对应的item
+           if (item.key===path || path.indexOf(item.key)===0) {
+            // 更新redux中的headerTitle状态
+            this.props.setHeadTitle(item.title)
+          }
           pre.push((
             <Menu.Item key={item.key}>
-              <Link to={item.key}>
+              <Link to={item.key} onClick={() => this.props.setHeadTitle(item.title)}>
                 <Icon type={item.icon}/>
                 <span>{item.title}</span>
               </Link>
@@ -200,4 +207,7 @@ withRouter高阶组件:
 包装非路由组件, 返回一个新的组件
 新的组件向非路由组件传递3个属性: history/location/match
  */
-export default withRouter(LeftNav)
+export default connect(
+  state => ({}),
+  {setHeadTitle}
+)(withRouter(LeftNav))
