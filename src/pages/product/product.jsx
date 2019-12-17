@@ -1,23 +1,24 @@
-import React, { Component } from 'react';
+import React, {Component} from 'react'
 import {Switch, Route, Redirect} from 'react-router-dom'
 
-import ProductUpdate from './add-update'
-import ProductDetail from './detail'
 import ProductHome from './home'
+import ProductAddUpdate from './add-update'
+import ProductDetail from './detail'
 
-import './detail.less'
+import './product.less'
 
-class Product extends Component {
-    render() {
-        return (
-            <Switch>
-                <Route path='/products/product' component={ProductHome} exact></Route>
-                <Route path='/products/product/detail' component={ProductDetail}></Route>
-                <Route path='/products/product/addupdate' component={ProductUpdate}></Route>
-                <Redirect to='/products/product'></Redirect>
-            </Switch>
-        );
-    }
+/*
+商品路由
+ */
+export default class Product extends Component {
+  render() {
+    return (
+      <Switch>
+        <Route path='/product' component={ProductHome} exact/> {/*路径完全匹配*/}
+        <Route path='/product/addupdate' component={ProductAddUpdate}/>
+        <Route path='/product/detail' component={ProductDetail}/>
+        <Redirect to='/product'/>
+      </Switch>
+    )
+  }
 }
-
-export default Product;
