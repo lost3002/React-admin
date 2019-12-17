@@ -2,7 +2,7 @@ import React from 'react'
 import {connect} from 'react-redux'
 
 import Counter from '../components/Counter'
-import {increment, decrement} from '../redux/actions'
+import {increment, decrement ,incrementAsync} from '../redux/actions'
 
 function mapStateToProps (state) {
   return {
@@ -17,7 +17,12 @@ function mapDisptchToprops (dispatch) {
   }
 }
 
+// export default connect(
+//   mapStateToProps,
+//   mapDisptchToprops
+// )(Counter)
+
 export default connect(
-  mapStateToProps,
-  mapDisptchToprops
+  state => ({count: state.count}),
+  {increment, decrement, incrementAsync}
 )(Counter)

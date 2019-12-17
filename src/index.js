@@ -1,17 +1,19 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import App from './cotainer/App';
-import {Provider} from 'react-redux'
+import memoryUtils from './utils/memoryUtils'
+import localstoreUtils from './utils/localstoreUtils'
 
-import store from './redux/store'
+import App from './App';
+
+const user = localstoreUtils.getUser()
+
+if(user && user._id){
+    memoryUtils.user = user
+}
 
 
 
 
-ReactDOM.render((
-    <Provider store={store}>
-        <App />
-    </Provider>
-), document.getElementById('root'));
+ReactDOM.render(<App />, document.getElementById('root'));
 
