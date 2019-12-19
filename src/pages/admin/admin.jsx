@@ -1,57 +1,65 @@
-import React, { Component } from 'react';
-import { Layout } from 'antd';
+import React, {Component} from 'react'
+import {Redirect, Route, Switch} from 'react-router-dom'
+import { Layout } from 'antd'
+import {connect} from 'react-redux'
 
-
-import { Redirect, Switch, Route } from 'react-router-dom'
-import memoryUtils from '../../utils/memoryUtils'
 import LeftNav from '../../components/left-nav'
 import Header from '../../components/header'
-import Home from '../home/home' 
-import Category from '../category/category' 
-import Product from '../product/product' 
-import Role from '../role/role' 
-import User from '../user/user' 
-import Bar from '../charts/bar' 
-import Line from '../charts/line' 
+import Home from '../home/home'
+import Category from '../category/category'
+import Product from '../product/product'
+import Role from '../role/role'
+import User from '../user/user'
+import Bar from '../charts/bar'
+import Line from '../charts/line'
 import Pie from '../charts/pie'
+import NotFound from '../not-found/not-found'
+import Order from '../order/order'
 
-const { Footer, Sider, Content } = Layout;
-
-
+const { Footer, Sider, Content } = Layout
+ 
+/*
+后台管理的路由组件
+ */
 class Admin extends Component {
-    render() {
-        const user = memoryUtils.user
-        if (!user || !user._id) {
-            return <Redirect to="/login" />
-        }
-
-        return (
-            <div style={{ height: '100%' }}>
-                <Layout style={{ minHeight: '100%' }} >
-                    <Sider>
-                        <LeftNav />
-                    </Sider>
-                    <Layout>
-                        <Header>Header</Header>
-                        <Content style={{ background: '#FFF' ,margin : '20px 15px'}}>
-                            <Switch>
-                                <Route path='/home' component={Home}></Route>
-                                <Route path='/product' component={Product}></Route>
-                                <Route path='/category' component={Category}></Route>
-                                <Route path='/role' component={Role}></Route>
-                                <Route path='/user' component={User}></Route>
-                                <Route path='/charts/bar' component={Bar}></Route>
-                                <Route path='/charts/line' component={Line}></Route>
-                                <Route path='/charts/pie' component={Pie}></Route>
-                                <Redirect to='/home'></Redirect>
-                            </Switch>
-                        </Content>
-                        <Footer style={{ textAlign: 'center', color: '#ccc' }}>请使用谷歌浏览器以获得更好的体验</Footer>
-                    </Layout>
-                </Layout>
-            </div>
-        );
+  render () {
+    const user = this.props.user
+    // 如果内存没有存储user ==> 当前没有登陆
+    if(!user || !user._id) {
+      // 自动跳转到登陆(在render()中)
+      return <Redirect to='/login'/>
     }
+    return (
+      <Layout style={{minHeight: '100%'}}>
+        <Sider>
+          <LeftNav/>
+        </Sider>
+        <Layout>
+          <Header>Header</Header>
+          <Content style={{margin: 20, backgroundColor: '#fff'}}>
+            <Switch>
+              <Redirect exact from='/' to='/home'/>
+              <Route path='/home' component={Home}/>
+              <Route path='/category' component={Category}/>
+              <Route path='/product' component={Product}/>
+              <Route path='/role' component={Role}/>
+              <Route path='/user' component={User}/>
+              <Route path='/charts/bar' component={Bar}/>
+              <Route path='/charts/line' component={Line}/>
+              <Route path='/charts/pie' component={Pie}/>
+              <Route path="/order" component={Order}/>
+              <Route component={NotFound}/> {/*上面没有一个匹配, 直接显示*/}
+            </Switch>
+          </Content>
+          <Footer style={{textAlign: 'center', color: '#cccccc'}}>推荐使用谷歌浏览器，可以获得更佳页面操作体验</Footer>
+        </Layout>
+      </Layout>
+    )
+  }
 }
 
-export default Admin;
+
+export default connect(
+  state => ({user: state.user}),
+  {}
+)(Admin)
